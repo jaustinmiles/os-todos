@@ -1,6 +1,10 @@
 import csv
 
 FILE_NAME = 'life_os_spread.csv'
+TASK_NAME_COL = 0
+PRIORITY_COL = 1
+DAILY_COL = 2
+COMPLETED_COL = 3
 
 
 def decide_task():
@@ -9,7 +13,7 @@ def decide_task():
         del rows[0]
     csv_file.close()
     tasks = [x for _, x in sorted(zip(priorities, rows), reverse=True)]
-    return tasks[0]
+    return tasks[TASK_NAME_COL]
 
 
 def get_rows(csv_file):
@@ -32,27 +36,50 @@ def get_priority(priorities, row):
     try:
         priorities.append(int(row[1]))
     except ValueError:
-        if row[1] != 'Priority':
+        if row[PRIORITY_COL] != 'Priority':
             print(row)
             raise ValueError("Priority must be an integer number")
 
 
 def mark_as_done():
     to_mark = decide_task()
-    to_mark[3] = 'TRUE'
-    with open(FILE_NAME, 'r') as csv_file:
-        _, rows = get_rows(csv_file)
-        csv_file.close()
-    for i, row in enumerate(rows):
-        if row[0] == to_mark[0]:
-            rows[i] = to_mark
+    to_mark[COMPLETED_COL] = 'TRUE'
+    rows = open_file_and_get_rows()
+    replace_row(rows, to_mark)
+    write_rows_to_file(rows)
+
+
+def write_rows_to_file(rows):
     with open(FILE_NAME, 'w') as write_file:
         c = csv.writer(write_file)
         c.writerows(rows)
         write_file.close()
 
 
+def replace_row(rows, to_mark):
+    for i, row in enumerate(rows):
+        if row[TASK_NAME_COL] == to_mark[TASK_NAME_COL]:
+            rows[i] = to_mark
+
+
+def open_file_and_get_rows():
+    with open(FILE_NAME, 'r') as csv_file:
+        _, rows = get_rows(csv_file)
+        csv_file.close()
+    return rows
+
+
+def mark_as_in_progress():
+    to_mark = decide_task()
+    num = int(to_mark[PRIORITY_COL]) - 1
+    to_mark[PRIORITY_COL] = str(num)
+    rows = open_file_and_get_rows()
+    replace_row(rows, to_mark)
+    write_rows_to_file(rows)
+
+
 if __name__ == '__main__':
     print(decide_task())
     # mark_as_done()
+    mark_as_in_progress()
     print(decide_task())
