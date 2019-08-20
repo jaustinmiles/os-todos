@@ -1,4 +1,6 @@
 import csv
+import getopt
+import sys
 
 FILE_NAME = 'life_os_spread.csv'
 TASK_NAME_COL = 0
@@ -78,8 +80,19 @@ def mark_as_in_progress():
     write_rows_to_file(rows)
 
 
+def main(argv):
+    print(decide_task())
+    try:
+        opts, args = getopt.getopt(argv, 'p')
+    except getopt.GetoptError:
+        print("Use os_todo.py -p to postpone a task")
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == "-p":
+            mark_as_in_progress()
+    print(decide_task())
+
+
 if __name__ == '__main__':
-    print(decide_task())
-    # mark_as_done()
-    mark_as_in_progress()
-    print(decide_task())
+    main(sys.argv[1:])
+
