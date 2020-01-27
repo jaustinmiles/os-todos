@@ -1,13 +1,18 @@
 import csv
+import datetime
 import getopt
+import json
 import sys
 
-FILE_NAME = 'life_os_spread.csv'
+FILE_NAME = 'test.csv'
 TASK_NAME_COL = 0
 PRIORITY_COL = 1
 DAILY_COL = 2
 COMPLETED_COL = 3
 MAX_PRIORITY = 16
+SIGN_IN_FILE = 'sign_in.json'
+
+## TODO: Make a display all function to look and see if a certain task is already there
 
 
 def decide_task():
@@ -85,6 +90,7 @@ def mark_as_in_progress(decrement):
 
 def main(argv):
     print(decide_task())
+    check_last_sign_in()
     try:
         opts, args = getopt.getopt(argv, 'pcxda')
     except getopt.GetoptError:
@@ -141,6 +147,25 @@ def add_task():
     rows = rows + row
     write_rows_to_file(rows)
     print("Success!")
+
+
+def check_last_sign_in():
+    with open(SIGN_IN_FILE, 'r') as f:
+        sign = json.load(f)
+    last = sign['last_sign_in']
+    year = last["year"]
+    month = last["month"]
+    day = last["day"]
+    last_sign = datetime.datetime(year, month, day)
+    today = datetime.datetime.now()
+    sign['last_sign_in']['year'] = today.year
+    sign['last_sign_in']['month'] = today.month
+    sign['last_sign_in']['day'] = today.day
+    with open(SIGN_IN_FILE, 'w') as out_file:
+        json.dump(sign, out_file)
+    days = today.day - last_sign.day
+    for i in range(days):
+        end_day()
 
 
 if __name__ == '__main__':
