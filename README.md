@@ -27,6 +27,13 @@ os_todo.py -x
 ```
 to extend the task's due date by 5 days. Make sure to enter these tasks as regular tasks, not as dailies.
 
+If you wish to reset a task to 0 (i.e. the task is a biweekly or extremely infrequent task, but still one that should be
+done consistently), run
+
+```
+os_todo.py -r
+```
+
 Finally, when your day is over, run 
 ```
 os_todo.py -d 
