@@ -4,7 +4,7 @@ import getopt
 import json
 import sys
 
-FILE_NAME = 'test.csv'
+FILE_NAME = "life_os_spread.csv"
 TASK_NAME_COL = 0
 PRIORITY_COL = 1
 DAILY_COL = 2
@@ -12,7 +12,8 @@ COMPLETED_COL = 3
 MAX_PRIORITY = 16
 SIGN_IN_FILE = 'sign_in.json'
 
-## TODO: Make a display all function to look and see if a certain task is already there
+
+# TODO: Make a display all function to look and see if a certain task is already there
 
 
 def decide_task():
@@ -82,6 +83,8 @@ def open_file_and_get_rows():
 def mark_as_in_progress(decrement):
     to_mark = decide_task()
     num = int(to_mark[PRIORITY_COL]) - decrement
+    if num < 0:
+        num = 0
     to_mark[PRIORITY_COL] = str(num)
     rows = open_file_and_get_rows()
     replace_row(rows, to_mark)
@@ -89,10 +92,10 @@ def mark_as_in_progress(decrement):
 
 
 def main(argv):
-    print(decide_task())
+    # print(decide_task())
     check_last_sign_in()
     try:
-        opts, args = getopt.getopt(argv, 'pcxda')
+        opts, args = getopt.getopt(argv, 'pcxdar')
     except getopt.GetoptError:
         print("Use os_todo.py -p to postpone a task by 1 day")
         print("Use os_todo.py -c to complete a task")
@@ -111,6 +114,8 @@ def main(argv):
             end_day()
         elif opt == "-a":
             add_task()
+        elif opt == "-r":
+            mark_as_in_progress(16)
     print(decide_task())
 
 
