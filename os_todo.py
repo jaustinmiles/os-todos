@@ -3,6 +3,7 @@ import datetime
 import getopt
 import json
 import sys
+from pprint import pprint
 
 FILE_NAME = "life_os_spread.csv"
 TASK_NAME_COL = 0
@@ -91,11 +92,19 @@ def mark_as_in_progress(decrement):
     write_rows_to_file(rows)
 
 
+def show_all_tasks():
+    with open(FILE_NAME, 'r') as csv_file:
+        priorities, rows = get_rows(csv_file)
+        tasks = [x for _, x in sorted(zip(priorities, rows), reverse=True)]
+        csv_file.close()
+    pprint(tasks)
+
+
 def main(argv):
     # print(decide_task())
     check_last_sign_in()
     try:
-        opts, args = getopt.getopt(argv, 'pcxdar')
+        opts, args = getopt.getopt(argv, 'pcxdars')
     except getopt.GetoptError:
         print("Use os_todo.py -p to postpone a task by 1 day")
         print("Use os_todo.py -c to complete a task")
@@ -116,6 +125,8 @@ def main(argv):
             add_task()
         elif opt == "-r":
             mark_as_in_progress(16)
+        elif opt == "-s":
+            show_all_tasks()
     print(decide_task())
 
 
