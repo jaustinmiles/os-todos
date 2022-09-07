@@ -24,7 +24,7 @@ def decide_task():
         del rows[0]
     csv_file.close()
     tasks = [x for _, x in sorted(zip(priorities, rows), reverse=True)]
-    return tasks[TASK_NAME_COL][TASK_NAME_COL]
+    return tasks[TASK_NAME_COL]
 
 
 def get_time(threshold: int) -> float:
@@ -143,7 +143,7 @@ def main(argv):
             show_all_tasks()
         elif opt == "-t":
             print("Tomorrow's time: " + str(round(get_time(15) - get_time(16), 1)))
-    print("Next task: " + decide_task())
+    print("Next task: " + decide_task()[TASK_NAME_COL])
     print("Time remaining: " + str(get_time(16)))
 
 
