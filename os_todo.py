@@ -10,6 +10,7 @@ TASK_NAME_COL = 0
 PRIORITY_COL = 1
 DAILY_COL = 2
 COMPLETED_COL = 3
+TIME_COL = 4
 MAX_PRIORITY = 16
 SIGN_IN_FILE = 'sign_in.json'
 
@@ -23,7 +24,20 @@ def decide_task():
         del rows[0]
     csv_file.close()
     tasks = [x for _, x in sorted(zip(priorities, rows), reverse=True)]
-    return tasks[TASK_NAME_COL]
+    return tasks[TASK_NAME_COL][TASK_NAME_COL]
+
+
+def get_time(threshold: int) -> float:
+    with open(FILE_NAME, 'r') as csv_file:
+        priorities, rows = get_rows(csv_file)
+        del rows[0]
+    csv_file.close()
+    tasks = [x for _, x in sorted(zip(priorities, rows), reverse=True)]
+    time_sum = 0.0
+    for task in tasks:
+        if int(task[PRIORITY_COL]) >= threshold:
+            time_sum += float(task[TIME_COL])
+    return time_sum
 
 
 def get_rows(csv_file):
@@ -104,7 +118,7 @@ def main(argv):
     # print(decide_task())
     check_last_sign_in()
     try:
-        opts, args = getopt.getopt(argv, 'pcxdars')
+        opts, args = getopt.getopt(argv, 'pcxdarst')
     except getopt.GetoptError:
         print("Use os_todo.py -p to postpone a task by 1 day")
         print("Use os_todo.py -c to complete a task")
@@ -127,7 +141,10 @@ def main(argv):
             mark_as_in_progress(16)
         elif opt == "-s":
             show_all_tasks()
-    print(decide_task())
+        elif opt == "-t":
+            print("Tomorrow's time: " + str(round(get_time(15) - get_time(16), 1)))
+    print("Next task: " + decide_task())
+    print("Time remaining: " + str(get_time(16)))
 
 
 def end_day():
@@ -148,8 +165,10 @@ def end_day():
 def add_task():
     name = input("What is the name of your task?")
     priority = input("In how many days is this task due? Enter 'Daily' if this is a daily task.")
+    time = input("How long will this task take you in hours?")
     try:
         priority = str(MAX_PRIORITY + 1 - int(priority))
+        time = str(float(time))
         daily = 'FALSE'
     except ValueError:
         if 'daily' in priority.lower():
@@ -158,7 +177,7 @@ def add_task():
         else:
             print("The value you entered was not a valid option. Please try again")
             return
-    row = [[name, priority, daily, 'FALSE']]
+    row = [[name, priority, daily, 'FALSE', time]]
     rows = open_file_and_get_rows()
     rows = rows + row
     write_rows_to_file(rows)
